@@ -11,18 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('inventory_movements', function (Blueprint $table) {
-            $table->id();
-            $table->string('comments')->nullable();
-            $table->foreignId('created_by')->references('id')->on('users')->onDelete('cascade');
-            $table->foreignId('item_id')->references('id')->on('items')->onDelete('cascade');
-            $table->foreignId('inventory_outbound_id')->references('id')->on('inventory_outbounds')->onDelete('cascade')->nullable();
-            $table->foreignId('inventory_entry_id')->references('id')->on('inventory_entries')->onDelete('cascade')->nullable();
-            $table->double('quantity');
-            $table->string('status');
-            $table->softDeletes();
-            $table->timestamps();
-        });
+//        Schema::create('inventory_movements', function (Blueprint $table) {
+//            $table->id();
+//            $table->string('comments')->nullable();
+//            $table->foreignId('created_by')->references('id')->on('users')->onDelete('cascade');
+//            $table->foreignId('item_id')->references('id')->on('items')->onDelete('cascade');
+//            $table->foreignId('inventory_outbound_id')->references('id')->on('inventory_outbounds')->onDelete('cascade')->nullable();
+//            $table->foreignId('inventory_entry_id')->references('id')->on('inventory_entries')->onDelete('cascade')->nullable();
+//            $table->double('quantity');
+//            $table->string('status');
+//            $table->softDeletes();
+//            $table->timestamps();
+//        });
     }
 
     /**

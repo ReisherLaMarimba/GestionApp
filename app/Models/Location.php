@@ -9,10 +9,11 @@ use Orchid\Filters\Types\Like;
 use Orchid\Filters\Types\Where;
 use Orchid\Filters\Types\WhereDateStartEnd;
 use Orchid\Screen\AsSource;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Location extends Model
+class Location extends Model implements Auditable
 {
-    use AsSource, softdeletes, Filterable;
+    use AsSource, softdeletes, Filterable, \OwenIt\Auditing\Auditable;
 
     protected $fillable = ['name', 'address', 'phone', 'email'];
 

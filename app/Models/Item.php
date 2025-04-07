@@ -6,12 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Orchid\Filters\Filterable;
 use Orchid\Screen\AsSource;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Item extends Model
+class Item extends Model implements Auditable
 {
-    use AsSource, softdeletes, Filterable;
+    use AsSource, softdeletes, Filterable, \OwenIt\Auditing\Auditable;
+    protected $fillable = ['name','item_code', 'description', 'weight', 'min_quantity', 'max_quantity','category_id', 'location_id', 'stock', 'images', 'damage_images', 'comments', 'status', 'additionals','assigned_to'];
 
-    protected $fillable = ['name','item_code', 'description', 'weight', 'min_quantity', 'max_quantity','category_id', 'location_id', 'stock', 'images', 'damage_images', 'comments', 'status'];
+
+    protected $casts = [
+        'additionals' => 'array',
+        'assigned_to' => 'array',
+    ];
+
 
     public function category()
     {
@@ -32,4 +39,15 @@ class Item extends Model
     {
         return $this->hasMany(InventoryOutbound::class);
     }
+
+//    public function user()
+//    {
+//        return $this->hasMany(User::class);
+//    }
+
+    public function additionals()
+    {
+        return $this->belongsToMany(Additional::class, 'item_additional', 'item_id', 'additional_id');
+    }
+
 }
