@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Orchid\Filters\Filterable;
 use Orchid\Screen\AsSource;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Category extends Model
+class Category extends Model implements Auditable
 {
- use AsSource, softdeletes, Filterable;
+ use AsSource, softdeletes, Filterable, \OwenIt\Auditing\Auditable;
 
  protected $fillable = ['name', 'description', 'risk'];
 

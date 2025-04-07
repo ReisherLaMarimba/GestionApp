@@ -2,14 +2,19 @@
 
 namespace App\Orchid\Screens\Items;
 
+use App\Models\Additional;
 use App\Models\Item;
 use App\Orchid\Layouts\items\ItemProductMovementsTable;
 use Illuminate\Http\Request;
+use Orchid\Screen\Actions\Button;
+use Orchid\Screen\Actions\ModalToggle;
+use Orchid\Screen\Layouts\Modal;
 use Orchid\Screen\Repository;
 use Orchid\Screen\Screen;
 use Orchid\Screen\Sight;
 use Orchid\Screen\TD;
 use Orchid\Support\Facades\Layout;
+use Orchid\Support\Facades\Toast;
 
 
 class ItemShowScreen extends Screen
@@ -30,9 +35,15 @@ class ItemShowScreen extends Screen
         $image = json_decode($item->image, true) ?? []; // Fallback to empty array if null
 
 
+        $audits = $item->audits; // Get audit logs for the item
+
+
         return [
             'item' => $item,
             'image' => $image,
+            'audits' => $item->audits,
+            'additionals' => $item->additionals ?? [],
+
         ];
     }
 
@@ -55,7 +66,20 @@ class ItemShowScreen extends Screen
      */
     public function commandBar(): iterable
     {
-        return [];
+        return [
+            Button::make('Volver al listado')
+                ->icon('bs.arrow-left')
+                ->method('back'),
+
+            Button::make('Editar')
+                ->icon('bs.pencil')
+                ->method('redirectToEdit'),
+
+            ModalToggle::make('Movimientos')
+                ->modal('auditModal') // Name of the modal
+                ->icon('list'),
+
+        ];
     }
 
     /**
@@ -66,13 +90,14 @@ class ItemShowScreen extends Screen
     public function layout(): iterable
     {
         return [
+
+
             Layout::split([
                 Layout::view('items.show-image'),
-//                Layout::view('items.show-info'),
                 Layout::legend('item', [
                     Sight::make('id')->popover('Unique identifier for the item'),
                     Sight::make('name', 'Name'),
-                    Sight::make('Item_code', 'Item Code'),
+                    Sight::make('item_code', 'Item Code'),
                     Sight::make('description', 'Description'),
                     Sight::make('weight', 'Weight')->render(fn (Item $item) => $item->weight ? $item->weight . ' kg' : 'N/A'),
                     Sight::make('stock', 'Stock')->render(fn (Item $item) => $item->stock ?? 'N/A'),
@@ -84,17 +109,78 @@ class ItemShowScreen extends Screen
                         : '<i class="text-danger">●</i> Asignado'),
                     Sight::make('category_id', 'Category')->render(fn (Item $item) => $item->category->name ?? 'Unknown Category'),
                     Sight::make('location_id', 'Location')->render(fn (Item $item) => $item->location->name ?? 'Unknown Location'),
-                    Sight::make('created_at', 'Created')->popover('Date when the item was added'),
-                    Sight::make('updated_at', 'Updated')->popover('Last updated date for the item'),
-                ])
+                    Sight::make('Additionals')->render(fn (Item $item) =>
+                    !empty($item->additionals)
+                        ? Additional::whereIn('id', $item->additionals)
+                        ->get()
+                        ->map(fn ($additional) => isset($additional->license)
+                            ? "<strong>{$additional->name}</strong> - Licencia: {$additional->license}"
+                            : "<strong>{$additional->name}</strong>")
+                        ->implode('<br>')
+                        : '<em>No additionals available</em>'
+                    ),
+
+
+                ]),
 
                 ])->ratio('40/60'),
 
 
-                    ItemProductMovementsTable::class
+            ItemProductMovementsTable::class,
+            Layout::modal('auditModal', [
+                Layout::table('audits', [
+                    TD::make('user', 'Usuario')
+                        ->render(fn($audit) => e($audit->user->name ?? 'Sistema')),
 
+                    TD::make('field', 'Campos Modificados')
+                        ->render(fn($audit) =>
+                        collect(array_keys($audit->getModified()))
+                            ->map(fn($field) => "<span class='badge bg-light text-dark me-1'>{$field}</span>")
+                            ->implode('')
+                        )->width('250px'),
 
-            ];
+                    TD::make('old', 'Valor Anterior')
+                        ->render(fn($audit) => $this->formatChangesAsList($audit->old_values)),
+
+                    TD::make('new', 'Nuevo Valor')
+                        ->render(fn($audit) => $this->formatChangesAsList($audit->new_values)),
+
+                    TD::make('date', 'Fecha de Modificación')
+                        ->render(fn($audit) => $audit->created_at->format('Y-m-d H:i')),
+                ])
+            ])->title('Historial de Cambios')->size(Modal::SIZE_LG)
+
+        ];
+
 
     }
+
+    Public function redirectToEdit(){
+        return redirect()->route('platform.items.edit', $this->item->id);
+    }
+
+    private function formatChanges(array $changes): string
+    {
+        return collect($changes)
+            ->map(fn($value, $field) => "<strong>{$field}:</strong> {$value}")
+            ->implode('<br>');
+    }
+
+    private function formatChangesAsList(array $changes = []): string
+    {
+        if (empty($changes)) return '<em>Sin datos</em>';
+
+        return '<ul class="list-unstyled mb-0">' . collect($changes)
+                ->map(fn($value, $field) => "<li><strong>{$field}:</strong> " . e($value) . "</li>")
+                ->implode('') . '</ul>';
+    }
+
+    public function back(){
+        return redirect()->route('platform.items');
+    }
+
+
+
+
+
 }

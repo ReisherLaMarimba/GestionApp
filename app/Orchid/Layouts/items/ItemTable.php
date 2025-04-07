@@ -30,7 +30,7 @@ class ItemTable extends Table
     {
         return [
 
-            TD::make('Item_code', 'Codigo')
+            TD::make('item_code', 'Codigo')
             ->cantHide(),
             TD::make('name', 'Nombre')
             ->cantHide(),

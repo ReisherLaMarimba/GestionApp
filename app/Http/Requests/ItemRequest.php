@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Route;
 
 class ItemRequest extends FormRequest
 {
@@ -30,10 +31,15 @@ class ItemRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
-            'item_code'    => 'required|string|unique:items,item_code',
+        $itemId = $this->route('item') ? $this->route('item')->id : null;
+
+        $rules = [
+            'item_code'    => 'required|string|unique:items,item_code,' . $itemId,
             'name'         => 'required|string',
             'weight'       => 'numeric',
+            'additionals'  => 'array',
+            'additionals.*' => 'string',
+
             'min_quantity' => [
                 'required',
                 'numeric',
@@ -44,13 +50,19 @@ class ItemRequest extends FormRequest
                 'numeric',
                 'gt:min_quantity', // Asegura que el valor sea mayor que 'min_quantity'
             ],
-            'stock'        => 'required|numeric',
             'description'  => 'required|string',
             'image'        => 'image|mimes:jpg,png,jpeg|max:2048',
             'comments'     => 'string',
             'category'     => 'required|integer|exists:categories,id',
             'location'     => 'required|integer|exists:locations,id',
-
         ];
+
+        // Solo requerir 'stock' si la solicitud es de creación
+        if (Route::currentRouteName() === 'platform.items') {
+            $rules['stock'] = 'required|numeric';
+        }
+
+        return $rules;
     }
+
 }

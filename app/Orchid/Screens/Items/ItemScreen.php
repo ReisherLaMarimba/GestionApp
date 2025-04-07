@@ -2,17 +2,22 @@
 
 namespace App\Orchid\Screens\Items;
 
+use App\Http\Requests\AssignBasicItemRequest;
 use App\Http\Requests\ItemRequest;
 use App\Jobs\ProcessImagesJob;
+use App\Models\Additional;
 use App\Models\Category;
 use App\Models\Item;
 use App\Models\Location;
+use App\Models\User;
 use App\Orchid\Layouts\items\ItemTable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Orchid\Screen\Actions\ModalToggle;
 use Orchid\Screen\Fields\Attach;
 use Orchid\Screen\Fields\Group;
 use Orchid\Screen\Fields\Input;
+use Orchid\Screen\Fields\Relation;
 use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Fields\TextArea;
 use Orchid\Screen\Layouts\Modal;
@@ -60,7 +65,12 @@ class ItemScreen extends Screen
             ModalToggle::make('Crear Articulo')
                 ->modal('itemsModal')
                 ->method('create')
-                ->icon('plus')
+                ->icon('plus'),
+
+            Modaltoggle::make('Assign Basic Items')
+                ->modal('assignBasicItemsModal')
+                ->method('assignBasicItems')
+                ->icon('list')
         ];
     }
 
@@ -72,8 +82,6 @@ class ItemScreen extends Screen
     public function layout(): iterable
     {
         return [
-
-
 
             Layout::modal('itemsModal', Layout::rows([
                 Group::make([
@@ -117,11 +125,6 @@ class ItemScreen extends Screen
                         ->help('Inserte la descripción del artículo')
                         ->rows(6),
 
-//                    Attach::make('image')
-//                        ->title('Subir Imagen')
-//                        ->accept('image/*')
-//                        ->help('Seleccione un archivo de imagen. Puede cargar archivos en formatos JPG.')
-//                        ->multiple()
 
                     Input::make('images')
                         ->type('file')
@@ -135,6 +138,13 @@ class ItemScreen extends Screen
                         ->title('Comentarios')
                         ->placeholder('Inserte un comentario del artículo')
                         ->help('Inserte la descripción del artículo'),
+
+                    Select::make('additionals')
+                        ->title('Aditionales')
+                        ->fromModel(Additional::class, 'name')
+                        ->multiple()
+                        ->placeholder('Aditionales del artículo')
+                        ->help('Elija la adtionales del artículo'),
                     ]),
 
                  Group::make([
@@ -154,6 +164,37 @@ class ItemScreen extends Screen
             ]))
                 ->title('Crear Artículo')
                 ->size(Modal::SIZE_LG),
+
+            Layout::modal('assignBasicItemsModal', Layout::rows([
+                Group::make([
+                    Select::make('items_id')
+                        ->title('Basic Items')
+                        ->fromModel(
+                            Item::whereHas('category', function ($query) {
+                                $query->where('name', '!=', 'CPU');
+                            }),
+                            'name', 'id'
+                        )
+                        ->multiple()
+                        ->placeholder('Basic Items')
+                        ->help('Elija los basic items'),
+
+                    Select::make('user_id')
+                        ->title('Select User')
+                        ->fromModel(User::class, 'name')
+                        ->multiple()
+                        ->placeholder('Select User')
+                        ->help('Elija los usuarios')
+
+
+
+        ]),
+
+
+            ]))->title('Assign Basic Items'),
+
+
+
 
             ItemTable::class
         ];
@@ -179,6 +220,7 @@ class ItemScreen extends Screen
 
             'category_id' => $itemRequest->category,
             'location_id' => $itemRequest->location,
+            'additionals' => $itemRequest->additionals,
 
             'comments' => $itemRequest->comments,
 //            'images' => [],
@@ -194,14 +236,39 @@ class ItemScreen extends Screen
 
                 ProcessImagesJob::dispatch($imagePath, $item->id, $column);
             }
+
+
         }
         Toast::success('El artículo se ha creado correctamente, las imagenes se estan optimizando');
+    }
 
+    public function assignBasicItems(AssignBasicItemRequest $assignBasicItemRequest)
+    {
+        DB::transaction(function () use ($assignBasicItemRequest) {
+            $itemsIds = $assignBasicItemRequest->get('items_id'); // Array of item IDs
+            $userIds = $assignBasicItemRequest->get('user_id'); // Array of user IDs
 
+            // Ensure the number of user IDs does not exceed 2
+            if (count($userIds) > 2) {
+                throw new \Exception('No se pueden asignar más de 2 usuarios a un ítem.');
+            }
 
+            foreach ($itemsIds as $itemId) {
+                $item = Item::findOrFail($itemId); // Find item or fail
 
+                // Replace the 'assigned_to' column with the new user IDs
+                $item->update([
+                    'assigned_to' => json_encode($userIds), // Save users as JSON
+                ]);
+            }
+        });
+
+        Toast::success('Usuarios asignados correctamente a los ítems seleccionados.');
 
     }
+
+
+
 
     public function remove(Request $request): void
     {

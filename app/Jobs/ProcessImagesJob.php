@@ -46,7 +46,7 @@ class ProcessImagesJob implements ShouldQueue
             Log::info("IMAGE PATH: {$this->imagePath}");
             Log::info("COLUMN: {$this->column}");
 
-            if(!Storage::get($this->imagePath)){
+            if (!Storage::exists($this->imagePath)) {
                 Log::error("Image file does not exist: {$this->imagePath}");
                 return;
             }
@@ -54,44 +54,53 @@ class ProcessImagesJob implements ShouldQueue
             // Retrieve image from storage
             $imageData = Storage::get($this->imagePath);
 
-
             // Use Intervention Image to process the image
             $image = Image::read($imageData)
-                ->resize(800, 600) // Resize the image
-                ->resizeCanvas(1280, 720); //No me acuerdo
+                ->resize(800, 600)
+                ->resizeCanvas(1280, 720);
 
-            // Encode the image to JPEG - Compressed with 70% quality
-            Log::error("BEFORE encode");
+            // Encode the image to JPEG
             $encodedImage = $image->toJpeg(quality: 70, progressive: false, strip: true);
-            Log::error("AFTER encode");
 
-            // Define the new storage path
+            // Define the new path
             $filename = basename($this->imagePath);
             $destinationPath = "items/{$this->column}/";
             $fullPath = "{$destinationPath}{$filename}";
 
-            // Make sure the directory exists
+            // Ensure the directory exists
             Storage::makeDirectory($destinationPath);
 
-            // Save the processed image
+            // Save the new image
             Storage::put($fullPath, $encodedImage);
 
-            // Update the database with the processed image path
+            // Find the item and update image
             $item = Item::find($this->itemId);
             if ($item) {
-                $existingImages = json_decode($item->{$this->column}, true) ?? [];
-                $existingImages[] = $fullPath;
-                $item->update([$this->column => json_encode($existingImages)]);
+                // Decode and filter any existing images
+                $existingImages = json_decode($item->{$this->column}, true);
+
+                if (is_array($existingImages)) {
+                    foreach ($existingImages as $oldImagePath) {
+                        if (is_string($oldImagePath) && Storage::exists($oldImagePath)) {
+                            Storage::delete($oldImagePath);
+                        }
+                    }
+                }
+
+                // Set the column with ONLY the new image path, safely encoded
+                $item->{$this->column} = json_encode([$fullPath], JSON_UNESCAPED_SLASHES);
+                $item->save();
             }
 
-            // Optionally delete the original image
+            // Delete the original uploaded image
             Storage::delete($this->imagePath);
 
-//            Log::info("Image processing completed successfully: {$fullPath}");
+            Log::info("Image processing completed successfully: {$fullPath}");
         } catch (\Exception $e) {
-            // Log any errors
             Log::error("Error processing image: {$e->getMessage()}");
             Log::error("Stack trace: " . $e->getTraceAsString());
         }
     }
+
+
 }

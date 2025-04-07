@@ -17,13 +17,9 @@ return new class extends Migration
             $table->double('quantity');
             $table->string('comments')->nullable();
             $table->foreignId('created_by')->references('id')->on('users')->onDelete('cascade');
-
-
-
-            //$table->unsignedBigInteger('inventory_outbound_id');
-
-
-
+            $table->string('source')->nullable(); // Ejemplo: "Compra", "Devolución"
+            $table->string('document_reference')->nullable(); // Ejemplo: "OC-12345"
+            $table->enum('entry_type', ['new', 'adjustment', 'return', 'correction'])->default('new')->nullable();
             $table->foreignId('item_id')->references('id')->on('items')->onDelete('cascade');
 //            $table->foreignId('asigned_user_id')->references('id')->on('users')->onDelete('cascade');
             $table->softDeletes();

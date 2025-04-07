@@ -26,11 +26,14 @@ return new class extends Migration
 
             $table->string('comments')->nullable();
             $table->string('status')->nullable();
-
+            $table->json('assigned_to')->nullable();
+            $table->json('additionals')->nullable();
+            $table->json('last_maintenance')->nullable();
             //relations
 
             $table->foreignId('category_id')->references('id')->on('categories')->onDelete('cascade');
             $table->foreignId('location_id')->references('id')->on('locations')->onDelete('cascade');
+
 
 
             $table->softDeletes();
