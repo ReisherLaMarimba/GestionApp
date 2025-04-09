@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\Item;
+use App\Orchid\Screens\Assigns\AssignScreen;
 use App\Orchid\Screens\Categories\CategoryEditScreen;
 use App\Orchid\Screens\Categories\CategoryScreen;
 use App\Orchid\Screens\Examples\ExampleActionsScreen;
@@ -160,3 +161,12 @@ Route::screen('items/{item}/edit', ItemEditScreen::class)
     ->breadcrumbs(fn (Trail $trail, Item $item) => $trail
         ->parent('platform.items') // Ajustando el padre correctamente
         ->push(__('Edit Item: ') . $item->name, route('platform.items.edit', ['item' => $item])));
+
+
+//assignations
+
+Route::screen('items/assignations', AssignScreen::class)
+    ->name('platform.items.assignations')
+    ->breadcrumbs(fn (Trail $trail) => $trail
+        ->parent('platform.items')
+        ->push(__('Assignations'), route('platform.items.assignations')));

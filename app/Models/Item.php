@@ -19,6 +19,14 @@ class Item extends Model implements Auditable
         'assigned_to' => 'array',
     ];
 
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'item_user')
+            ->using(ItemUser::class) // Specify custom pivot model
+            ->withTimestamps();
+    }
+
+
 
     public function category()
     {

@@ -51,6 +51,10 @@ class PlatformProvider extends OrchidServiceProvider
                 ->route('platform.locations'),
 
 
+            Menu::make('Assign Computer')
+            ->icon('bs.collection')
+                ->route('platform.items.assignations'),
+
             Menu::make('Get Started')
                 ->icon('bs.book')
                 ->title('Navigation')

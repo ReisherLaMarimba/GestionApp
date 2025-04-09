@@ -48,16 +48,18 @@ class ItemTable extends Table
             TD::make(__('Actions'))
                 ->align(TD::ALIGN_CENTER)
                 ->width('100px')
+                ->cantHide()
                 ->render(fn ($items) => DropDown::make()
                     ->icon('bs.three-dots-vertical')
                     ->list([
-                        Link::make(__('Edit'))
-                            ->route('platform.items.edit', $items->id)
-                            ->icon('bs.pencil'),
 
                         Link::make(__('Ver'))
                             ->route('platform.items.show', $items->id)
                             ->icon('bs.eye'),
+
+                        Link::make(__('Edit'))
+                            ->route('platform.items.edit', $items->id)
+                            ->icon('bs.pencil'),
 
                         Button::make(__('Delete'))
                             ->icon('bs.trash3')
