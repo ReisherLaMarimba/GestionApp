@@ -66,4 +66,17 @@ class User extends Authenticatable
         'updated_at',
         'created_at',
     ];
+
+    public function items()
+    {
+        return $this->belongsToMany(Item::class, 'item_user')
+            ->using(ItemUser::class)
+            ->withTimestamps()
+            ->wherePivotNull('deleted_at')
+            ->withPivot('id', 'deleted_at');
+    }
+    public function campaign()
+    {
+        return $this->belongsTo(Campaign::class);
+    }
 }

@@ -24,7 +24,7 @@ class AssignBasicItemRequest extends FormRequest
         return [
             'items_id' => 'required|array', // Ensure items_id is an array
             'items_id.*' => 'integer|exists:items,id', // Validate each item ID exists
-            'user_id' => 'required|array|max:2', // Limit user IDs to a maximum of 2
+            'user_id' => 'required|array|max:1', // Limit user IDs to a maximum of 2
             'user_id.*' => 'integer|exists:users,id', // Validate each user ID exists
         ];
 
@@ -33,7 +33,7 @@ class AssignBasicItemRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'user_id.max' => 'Solo puede asignar hasta 2 usuarios por item.', // Error message
+            'user_id.max' => 'Solo puede asignar hasta 1 usuarios por item.', // Error message
         ];
     }
 }

@@ -8,6 +8,7 @@ use App\Jobs\ProcessImagesJob;
 use App\Models\Additional;
 use App\Models\Category;
 use App\Models\Item;
+use App\Models\ItemUser;
 use App\Models\Location;
 use App\Models\User;
 use App\Orchid\Layouts\items\ItemTable;
@@ -46,12 +47,12 @@ class ItemScreen extends Screen
      */
     public function name(): ?string
     {
-        return 'Articulos';
+        return 'Items List';
     }
 
     public function description(): ?string
     {
-        return 'Aqui podes ver y editar todos los articulos';
+        return 'Here you can view and edit all the items';
     }
 
     /**
@@ -62,12 +63,12 @@ class ItemScreen extends Screen
     public function commandBar(): iterable
     {
         return [
-            ModalToggle::make('Crear Articulo')
+            ModalToggle::make('Create Item')
                 ->modal('itemsModal')
                 ->method('create')
                 ->icon('plus'),
 
-            Modaltoggle::make('Assign Basic Items')
+            Modaltoggle::make('Assign facilities')
                 ->modal('assignBasicItemsModal')
                 ->method('assignBasicItems')
                 ->icon('list')
@@ -170,8 +171,8 @@ class ItemScreen extends Screen
                     Select::make('items_id')
                         ->title('Basic Items')
                         ->fromModel(
-                            Item::whereHas('category', function ($query) {
-                                $query->where('name', '!=', 'CPU');
+                            Item::whereHas('category', function ($query) { // Filtrar por categoría
+                                $query->where('name', '=', 'Facilities');
                             }),
                             'name', 'id'
                         )
@@ -191,7 +192,7 @@ class ItemScreen extends Screen
         ]),
 
 
-            ]))->title('Assign Basic Items'),
+            ]))->title('Assign Facilities'),
 
 
 
@@ -244,28 +245,20 @@ class ItemScreen extends Screen
 
     public function assignBasicItems(AssignBasicItemRequest $assignBasicItemRequest)
     {
-        DB::transaction(function () use ($assignBasicItemRequest) {
-            $itemsIds = $assignBasicItemRequest->get('items_id'); // Array of item IDs
-            $userIds = $assignBasicItemRequest->get('user_id'); // Array of user IDs
+        $data = $assignBasicItemRequest->all();
 
-            // Ensure the number of user IDs does not exceed 2
-            if (count($userIds) > 2) {
-                throw new \Exception('No se pueden asignar más de 2 usuarios a un ítem.');
-            }
-
-            foreach ($itemsIds as $itemId) {
-                $item = Item::findOrFail($itemId); // Find item or fail
-
-                // Replace the 'assigned_to' column with the new user IDs
-                $item->update([
-                    'assigned_to' => json_encode($userIds), // Save users as JSON
+        foreach($data['items_id'] as $itemId){
+            ItemUser::create([
+                'user_id' => $data['user_id'][0],
+                'item_id' => $itemId,
                 ]);
+
+
             }
-        });
+        Toast::success('Asignado correctamente');
+        }
 
-        Toast::success('Usuarios asignados correctamente a los ítems seleccionados.');
 
-    }
 
 
 
@@ -276,4 +269,41 @@ class ItemScreen extends Screen
 
         Toast::info(__('Item eliminado'));
     }
+
+    public function printCode(Request $request)
+    {
+        $item = Item::findOrFail($request->get('id'));
+
+        // ZPL ajustado para las dimensiones 1.197" x 1.004"
+        $zpl = "^XA" .
+            "^PW243^LL204^LH0,0" . // Tamaño de la etiqueta: ancho 243 dots, alto 204 dots
+
+            // Campo para el texto del código centrado
+            "^FX Campo para el elemento 'CODE'" .
+            "^FO20,10^FWN^CF0,30^FB243,1,C,0^FD" . $item->item_code . "^FS" .
+
+            // Campo para el código de barras basado en el código del ítem
+            "^FX Campo para el código de barras del código" .
+            "^FO20,50^FWN^BY1,2,50^BCN,50,N,N" .
+            "^FD" . $item->item_code . "^FS" .
+
+            "^XZ";
+
+        // Ruta de la impresora compartida (ajustar si es necesario)
+        $printerPath = "\\\\localhost\\ZEBRAZD410";
+
+        // Guardamos temporalmente el ZPL en un archivo
+        $tmpFile = tempnam(sys_get_temp_dir(), 'zpl');
+        file_put_contents($tmpFile, $zpl);
+
+        // Envía el archivo a la impresora
+        exec("COPY /B \"$tmpFile\" \"$printerPath\"");
+
+        // Elimina el archivo temporal
+        unlink($tmpFile);
+
+        toast::success('Código impreso correctamente');
+    }
+
+
 }

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Orchid\Screens\User;
 
+use App\Models\ItemUser;
+use App\Models\User;
+use App\Orchid\Layouts\Assigns\ItemAssignedToUserTable;
 use App\Orchid\Layouts\Role\RolePermissionLayout;
 use App\Orchid\Layouts\User\UserEditLayout;
 use App\Orchid\Layouts\User\UserPasswordLayout;
@@ -13,7 +16,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Orchid\Access\Impersonation;
-use App\Models\User;
 use Orchid\Screen\Action;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Screen;
@@ -36,10 +38,14 @@ class UserEditScreen extends Screen
     public function query(User $user): iterable
     {
         $user->load(['roles']);
+        $user->load('items');
+
+
 
         return [
             'user'       => $user,
             'permission' => $user->getStatusPermission(),
+            'items'      => $user->items()->with('location')->get(),
         ];
     }
 
@@ -143,6 +149,18 @@ class UserEditScreen extends Screen
                         ->method('save')
                 ),
 
+            Layout::block(ItemAssignedToUserTable::class)
+            ->title(__('Items assigned to user'))
+            ->description(__('Items assigned to user'))
+            ->commands(
+                Button::make(__('Unlink all items'))
+                    ->type(Color::BASIC)
+                    ->icon('bs.link-45deg')
+                    ->canSee($this->user->exists)
+                    ->confirm(__('Are you sure you want to Unlink all items assigned to this user?'))
+                    ->method('unlinkAll')
+            )
+
         ];
     }
 
@@ -203,5 +221,18 @@ class UserEditScreen extends Screen
         Toast::info(__('You are now impersonating this user'));
 
         return redirect()->route(config('platform.index'));
+    }
+
+    public function unlink(Request $request)
+    {
+//        dd($request->all());
+
+        $pivot = ItemUser::where('id', $request->pivot_id)->first();
+
+        $pivot->delete();
+
+        Toast::info(__('Item was unlinked'));
+
+        return back();
     }
 }

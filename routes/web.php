@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AvailablesItemsApi;
 use App\Jobs\ProcessImagesJob;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -12,6 +13,8 @@ use Illuminate\Support\Facades\Response;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/api/available-items', [AvailablesItemsApi::class, 'getAvailablesItems'])->name('api.available-items');
 
 
 //Route::get('/image', function () {

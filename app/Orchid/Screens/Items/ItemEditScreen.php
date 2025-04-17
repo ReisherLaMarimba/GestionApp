@@ -170,29 +170,38 @@ class ItemEditScreen extends Screen
     public function update(ItemRequest $itemRequest, Item $item)
     {
         DB::transaction(function () use ($itemRequest, $item) {
-            // Filtra los datos que realmente fueron enviados en la solicitud
-            $data = $itemRequest->only(array_keys($itemRequest->all()));
+            $data = $itemRequest->only([
+                'item_code',
+                'name',
+                'weight',
+                'min_quantity',
+                'max_quantity',
+                'description',
+                'comments',
+                'category',
+                'location',
+            ]);
 
-            // Actualiza solo los campos proporcionados
+            // Mapeo de campos para la base de datos
+            $data['category_id'] = $data['category'];
+            $data['location_id'] = $data['location'];
+            unset($data['category'], $data['location']); // Remueve los originales
+
+
             $item->update($data);
 
             // Verificar si se han enviado imágenes
             if ($itemRequest->hasFile('images')) {
-                $image = $itemRequest->file('images')[0]; // solo la primera imagen
+                $image = $itemRequest->file('images')[0]; // Solo la primera imagen
                 $imagePath = $image->store('/images/temp');
 
                 ProcessImagesJob::dispatch($imagePath, $item->id, 'images');
-
-                    Toast::info('Item actualizado exitosamente, y las imágenes están siendo procesadas.');
-                
-            }else{
+                Toast::info('Item actualizado exitosamente, y las imágenes están siendo procesadas.');
+            } else {
                 Toast::info('Item actualizado exitosamente, sin imágenes');
             }
-
-
         });
     }
-
     public function cancelEdit()
     {
         return redirect()->route('platform.items');

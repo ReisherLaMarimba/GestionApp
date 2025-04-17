@@ -79,6 +79,10 @@ class ItemShowScreen extends Screen
                 ->modal('auditModal') // Name of the modal
                 ->icon('list'),
 
+            Button::make('Print TAG')
+            ->icon('printer')
+            ->method('printTAG')
+
         ];
     }
 
@@ -179,6 +183,39 @@ class ItemShowScreen extends Screen
         return redirect()->route('platform.items');
     }
 
+    Public function printTAG(){
+        $item = Item::findOrFail($this->item->id);
+
+        // ZPL ajustado para las dimensiones 1.197" x 1.004"
+        $zpl = "^XA" .
+            "^PW243^LL204^LH0,0" . // Tamaño de la etiqueta: ancho 243 dots, alto 204 dots
+
+            // Campo para el texto del código centrado
+            "^FX Campo para el elemento 'CODE'" .
+            "^FO20,10^FWN^CF0,30^FB243,1,C,0^FD" . $item->item_code . "^FS" .
+
+            // Campo para el código de barras basado en el código del ítem
+            "^FX Campo para el código de barras del código" .
+            "^FO20,50^FWN^BY1,2,50^BCN,50,N,N" .
+            "^FD" . $item->item_code . "^FS" .
+
+            "^XZ";
+
+        // Ruta de la impresora compartida (ajustar si es necesario)
+        $printerPath = "\\\\localhost\\ZEBRAZD410";
+
+        // Guardamos temporalmente el ZPL en un archivo
+        $tmpFile = tempnam(sys_get_temp_dir(), 'zpl');
+        file_put_contents($tmpFile, $zpl);
+
+        // Envía el archivo a la impresora
+        exec("COPY /B \"$tmpFile\" \"$printerPath\"");
+
+        // Elimina el archivo temporal
+        unlink($tmpFile);
+
+        toast::success('Código impreso correctamente');
+    }
 
 
 
