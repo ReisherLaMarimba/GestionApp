@@ -67,6 +67,12 @@ class ItemTable extends Table
                             ->method('remove', [
                                 'id' => $items->id,
                             ]),
+
+                        Button::make(__('Print Code'))
+                        ->icon('bs.printer')
+                        ->method('printCode', [
+                            'id' => $items->id,
+                        ]),
                     ])),
 
 

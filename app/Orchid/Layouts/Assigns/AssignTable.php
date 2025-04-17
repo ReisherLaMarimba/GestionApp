@@ -41,6 +41,10 @@ class AssignTable extends Table
    return[
        TD::make('item_code','Code'),
        TD::make('name','Name'),
+       TD::make('Location','Location')
+       ->render(function($item){
+           return $item->location->name;
+       }),
        TD::make('assigned_to','Assigned To')->render(function($item){
            return $item->users->pluck('name')->implode('<strong> & </strong>');
        }),

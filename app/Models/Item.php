@@ -10,7 +10,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Item extends Model implements Auditable
 {
-    use AsSource, softdeletes, Filterable, \OwenIt\Auditing\Auditable;
+    use AsSource, Softdeletes, Filterable, \OwenIt\Auditing\Auditable;
     protected $fillable = ['name','item_code', 'description', 'weight', 'min_quantity', 'max_quantity','category_id', 'location_id', 'stock', 'images', 'damage_images', 'comments', 'status', 'additionals','assigned_to'];
 
 
@@ -22,8 +22,9 @@ class Item extends Model implements Auditable
     public function users()
     {
         return $this->belongsToMany(User::class, 'item_user')
-            ->using(ItemUser::class) // Specify custom pivot model
-            ->withTimestamps();
+            ->using(ItemUser::class)
+            ->withTimestamps()
+            ->withPivot('id', 'deleted_at');
     }
 
 
@@ -57,5 +58,7 @@ class Item extends Model implements Auditable
     {
         return $this->belongsToMany(Additional::class, 'item_additional', 'item_id', 'additional_id');
     }
+
+
 
 }

@@ -9,4 +9,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class ItemUser extends Pivot
 {
    use SoftDeletes;
+
+    protected $table = 'item_user';
+
+    protected $dates = ['deleted_at'];
 }

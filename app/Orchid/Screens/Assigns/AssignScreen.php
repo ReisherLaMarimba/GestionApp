@@ -25,9 +25,12 @@ class AssignScreen extends Screen
     {
 
         return [
-            'items' =>   $items = Item::with([
-                'users.campaign',  // Incluye la campaña de cada usuario
-                'location'         // Incluye la ubicación del item
+            'items' => $items = Item::with([
+                'users' => function ($query) {
+                    $query->wherePivotNull('deleted_at'); // Excluir soft deleted en la tabla pivot
+                },
+                'users.campaign',
+                'location'
             ])->get()
 
         ];
@@ -42,6 +45,8 @@ class AssignScreen extends Screen
     {
         return 'Assign Computers to Users';
     }
+
+
 
     /**
      * The screen's action buttons.
@@ -206,43 +211,39 @@ class AssignScreen extends Screen
     protected function storeAssignments(array $data)
     {
         DB::transaction(function () use ($data) {
-            // Assign CPU to users
-            foreach ($data['user_id'] as $userId) {
-                DB::table('item_user')->insert([
-                    'item_id' => $data['cpu_id'],
-                    'user_id' => $userId,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-
-            // Assign Monitors to users if selected
-            if (!empty($data['monitor_id'])) {
-                foreach ($data['monitor_id'] as $monitorId) {
-                    foreach ($data['user_id'] as $userId) {
-                        DB::table('item_user')->insert([
-                            'item_id' => $monitorId,
+            // Helper to insert assignments
+            $insertAssignments = function ($itemIds, $userIds) {
+                $assignments = [];
+                foreach ($itemIds as $itemId) {
+                    foreach ($userIds as $userId) {
+                        $assignments[] = [
+                            'item_id' => $itemId,
                             'user_id' => $userId,
                             'created_at' => now(),
                             'updated_at' => now(),
-                        ]);
+                        ];
                     }
                 }
+                DB::table('item_user')->insert($assignments);
+            };
+
+            // Assign CPU to users
+            $insertAssignments([$data['cpu_id']], $data['user_id']);
+
+            // Assign Monitors to users if selected
+            if (!empty($data['monitor_id'])) {
+                $insertAssignments($data['monitor_id'], $data['user_id']);
             }
 
             // Assign other items (headset, keyboard, mouse) to users
             foreach (['headset_id', 'keyboard_id', 'mouse_id'] as $itemField) {
                 if (!empty($data[$itemField])) {
-                    foreach ($data['user_id'] as $userId) {
-                        DB::table('item_user')->insert([
-                            'item_id' => $data[$itemField],
-                            'user_id' => $userId,
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]);
-                    }
+                    $insertAssignments([$data[$itemField]], $data['user_id']);
                 }
             }
         });
+
+        // Send notification
+        TOAST::INFO('Assigned properly completed');
     }
 }
