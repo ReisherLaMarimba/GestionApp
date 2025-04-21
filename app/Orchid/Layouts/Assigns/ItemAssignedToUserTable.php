@@ -43,9 +43,11 @@ class ItemAssignedToUserTable extends Table
            TD::make('location', 'Item location')
             ->render(fn ($item) => $item->location->name),
             TD::make('Unlink')
+                ->CantHide()
                 ->render(fn ($item) => Button::make('Unlink Item')
                     ->icon('bs.link-45deg')
                     ->confirm(__('Are you sure you want to Unlink ' . $item->name . ' located in ' . $item->location->name . ' from this user?'))
+
                     ->method('unlink', [
                         'pivot_id' => $item->pivot->id,
                     ])

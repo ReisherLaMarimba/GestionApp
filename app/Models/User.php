@@ -79,4 +79,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Campaign::class);
     }
+
+    public function task()
+    {
+        return $this->belongsTo(Task::class);
+    }
 }
