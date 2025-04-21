@@ -11,13 +11,16 @@ use App\Orchid\Layouts\Role\RolePermissionLayout;
 use App\Orchid\Layouts\User\UserEditLayout;
 use App\Orchid\Layouts\User\UserPasswordLayout;
 use App\Orchid\Layouts\User\UserRoleLayout;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Orchid\Access\Impersonation;
 use Orchid\Screen\Action;
 use Orchid\Screen\Actions\Button;
+use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Screen;
 use Orchid\Support\Color;
 use Orchid\Support\Facades\Layout;
@@ -153,12 +156,21 @@ class UserEditScreen extends Screen
             ->title(__('Items assigned to user'))
             ->description(__('Items assigned to user'))
             ->commands(
-                Button::make(__('Unlink all items'))
-                    ->type(Color::BASIC)
-                    ->icon('bs.link-45deg')
-                    ->canSee($this->user->exists)
-                    ->confirm(__('Are you sure you want to Unlink all items assigned to this user?'))
-                    ->method('unlinkAll')
+
+                Link::make(__('Print document'))
+                    ->icon('bs.print')
+                    ->href(route('print.equipment_assignment',['user_id' => $this->user->id])),
+
+//                Button::make(__('Unlink all items'))
+//                    ->type(Color::BASIC)
+//                    ->icon('bs.link-45deg')
+//                    ->canSee($this->user->exists)
+//                    ->confirm(__('Are you sure you want to Unlink all items assigned to this user?'))
+//                    ->method('unlinkAll'),
+
+
+
+
             )
 
         ];
@@ -235,4 +247,15 @@ class UserEditScreen extends Screen
 
         return back();
     }
+
+
+    public function printDocument(User $user)
+    {
+        $pdf = Pdf::loadView('Assignments.equipment_assignment',['imagePath' => 'images/cmaxlogo.png']);
+        $pdf->setPaper('letter' );
+        return $pdf->stream('equipment_assignment.pdf');
+    }
+
+
+
 }

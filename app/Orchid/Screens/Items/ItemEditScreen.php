@@ -140,6 +140,8 @@ class ItemEditScreen extends Screen
                         ->title('Adicionales')
                         ->fromModel(Additional::class, 'name')
                         ->multiple()
+                        //Can see only if this item is CPU category
+                        ->canSee($this->item->category->name == 'CPU')
                         ->value($this->item->additionals)
                         ->placeholder('Aditionales del artículo')
                         ->help('Elija la adtionales del artículo'),
@@ -180,6 +182,7 @@ class ItemEditScreen extends Screen
                 'comments',
                 'category',
                 'location',
+                'additionals'
             ]);
 
             // Mapeo de campos para la base de datos

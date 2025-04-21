@@ -56,7 +56,7 @@ class Item extends Model implements Auditable
 
     public function additionals()
     {
-        return $this->belongsToMany(Additional::class, 'item_additional', 'item_id', 'additional_id');
+        return $this->hasMany(Additional::class, 'item_additional', 'item_id', 'additional_id');
     }
 
 
