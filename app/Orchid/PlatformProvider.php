@@ -50,6 +50,10 @@ class PlatformProvider extends OrchidServiceProvider
                     ->route('platform.locations')
                 ->route('platform.locations'),
 
+            Menu::make('Tasks')
+                ->icon('bs.list')
+                    ->route('platform.tasks'),
+
 
             Menu::make('Assigns and Facilities')
             ->icon('bs.collection')

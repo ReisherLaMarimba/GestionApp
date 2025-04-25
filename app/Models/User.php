@@ -80,8 +80,8 @@ class User extends Authenticatable
         return $this->belongsTo(Campaign::class);
     }
 
-    public function task()
+    public function tasks()
     {
-        return $this->belongsTo(Task::class);
+        return $this->hasOne(Task::class);
     }
 }

@@ -23,6 +23,8 @@ use App\Orchid\Screens\locations\LocationScreen;
 use App\Orchid\Screens\PlatformScreen;
 use App\Orchid\Screens\Role\RoleEditScreen;
 use App\Orchid\Screens\Role\RoleListScreen;
+use App\Orchid\Screens\tasks\TaskEditScreen;
+use App\Orchid\Screens\tasks\TaskScreen;
 use App\Orchid\Screens\User\UserEditScreen;
 use App\Orchid\Screens\User\UserListScreen;
 use App\Orchid\Screens\User\UserProfileScreen;
@@ -170,3 +172,17 @@ Route::screen('items/assignations', AssignScreen::class)
     ->breadcrumbs(fn (Trail $trail) => $trail
         ->parent('platform.items')
         ->push(__('Assignations'), route('platform.items.assignations')));
+
+///TASKS
+
+Route::screen('tasks', TaskScreen::class)
+    ->name('platform.tasks')
+    ->breadcrumbs(fn (Trail $trail) => $trail
+        ->parent('platform.index')
+        ->push(__('Task List'), route('platform.tasks')));
+
+Route::screen('tasks/{task}/edit', TaskEditScreen::class)
+    ->name('platform.tasks.edit')
+    ->breadcrumbs(fn (Trail $trail, $task) => $trail
+        ->parent('platform.tasks')
+        ->push($task->name, route('platform.tasks.edit', ['task' => $task])));
