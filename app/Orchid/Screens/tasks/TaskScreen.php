@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Orchid\Screens\tasks;
+namespace App\Orchid\Screens\Tasks;
 
 use App\Http\Requests\TaskRequest;
 use App\Models\Task;
