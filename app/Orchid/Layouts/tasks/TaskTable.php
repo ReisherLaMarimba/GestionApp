@@ -22,6 +22,8 @@ class TaskTable extends Table
      */
     protected $target = 'tasks';
 
+    //TODO: Add a filter to search by name
+
     protected function textNotFound(): string
     {
         return 'There are no tasks';
