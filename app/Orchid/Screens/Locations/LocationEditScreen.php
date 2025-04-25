@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Orchid\Screens\locations;
+namespace App\Orchid\Screens\Locations;
 
 use App\Models\Location;
 use Illuminate\Http\Request;

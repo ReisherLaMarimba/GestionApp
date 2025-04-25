@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Orchid\Layouts\locations;
+namespace App\Orchid\Layouts\Locations;
 
 use App\Models\Location;
 use Orchid\Screen\Actions\Button;

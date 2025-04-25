@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('Hire_date')->nullable();
             $table->string('Schedule_type')->nullable();
             $table->unsignedBigInteger('task_id')->nullable();
-            $table->foreign('task_id')->references('id')->on('tasks')->onDelete('cascade');
+            $table->foreign('task_id')->references('id')->on('Tasks')->onDelete('cascade');
 
 
         });

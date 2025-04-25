@@ -4,7 +4,7 @@ namespace App\Orchid\Screens\Items;
 
 use App\Models\Additional;
 use App\Models\Item;
-use App\Orchid\Layouts\items\ItemProductMovementsTable;
+use App\Orchid\Layouts\Items\ItemProductMovementsTable;
 use Illuminate\Http\Request;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Actions\ModalToggle;

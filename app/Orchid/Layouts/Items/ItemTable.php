@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Orchid\Layouts\items;
+namespace App\Orchid\Layouts\Items;
 
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Actions\DropDown;
