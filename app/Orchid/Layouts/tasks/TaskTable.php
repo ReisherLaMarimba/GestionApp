@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Orchid\Layouts\tasks;
+namespace App\Orchid\Layouts\Tasks;
 
 use App\Http\Requests\TaskRequest;
 use Orchid\Screen\Actions\Button;
