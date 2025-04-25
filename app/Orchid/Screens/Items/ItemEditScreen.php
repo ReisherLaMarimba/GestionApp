@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Orchid\Screens\items;
+namespace App\Orchid\Screens\Items;
 
 use App\Http\Requests\ItemRequest;
 use App\Jobs\ProcessImagesJob;
