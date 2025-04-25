@@ -4,14 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Orchid\Screen\AsSource;
 
 class Task extends Model
 {
-   use SoftDeletes;
+   use SoftDeletes, asSource;
 
     protected $fillable = ['name', 'description'];
 
-    public function user()
+    public function users()
     {
         return $this->hasmany(User::class);
     }
