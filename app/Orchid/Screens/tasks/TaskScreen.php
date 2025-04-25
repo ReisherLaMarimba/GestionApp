@@ -5,7 +5,7 @@ namespace App\Orchid\Screens\Tasks;
 use App\Http\Requests\TaskRequest;
 use App\Models\Task;
 use App\Orchid\Layouts\Tasks\Charts\UserPerTaskChart;
-use App\Orchid\Layouts\tasks\TaskTable;
+use App\Orchid\Layouts\Tasks\TaskTable;
 use Illuminate\Http\Request;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Actions\ModalToggle;
