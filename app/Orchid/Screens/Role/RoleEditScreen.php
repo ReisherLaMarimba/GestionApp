@@ -92,13 +92,13 @@ class RoleEditScreen extends Screen
                 RoleEditLayout::class,
             ])
                 ->title('Role')
-                ->description('Defines a set of privileges that grant users access to various services and allow them to perform specific tasks or operations.'),
+                ->description('Defines a set of privileges that grant users access to various services and allow them to perform specific Tasks or operations.'),
 
             Layout::block([
                 RolePermissionLayout::class,
             ])
                 ->title('Permission/Privilege')
-                ->description('A privilege is necessary to perform certain tasks and operations in an area.'),
+                ->description('A privilege is necessary to perform certain Tasks and operations in an area.'),
         ];
     }
 

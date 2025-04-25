@@ -11,7 +11,7 @@ use App\Models\Item;
 use App\Models\ItemUser;
 use App\Models\Location;
 use App\Models\User;
-use App\Orchid\Layouts\items\ItemTable;
+use App\Orchid\Layouts\Items\ItemTable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Orchid\Screen\Actions\ModalToggle;

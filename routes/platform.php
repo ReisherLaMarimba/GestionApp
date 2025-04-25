@@ -18,13 +18,13 @@ use App\Orchid\Screens\Examples\ExampleTextEditorsScreen;
 use App\Orchid\Screens\items\ItemEditScreen;
 use App\Orchid\Screens\Items\ItemScreen;
 use App\Orchid\Screens\items\ItemShowScreen;
-use App\Orchid\Screens\locations\LocationEditScreen;
-use App\Orchid\Screens\locations\LocationScreen;
+use App\Orchid\Screens\Locations\LocationEditScreen;
+use App\Orchid\Screens\Locations\LocationScreen;
 use App\Orchid\Screens\PlatformScreen;
 use App\Orchid\Screens\Role\RoleEditScreen;
 use App\Orchid\Screens\Role\RoleListScreen;
-use App\Orchid\Screens\tasks\TaskEditScreen;
-use App\Orchid\Screens\tasks\TaskScreen;
+use App\Orchid\Screens\Tasks\TaskEditScreen;
+use App\Orchid\Screens\Tasks\TaskScreen;
 use App\Orchid\Screens\User\UserEditScreen;
 use App\Orchid\Screens\User\UserListScreen;
 use App\Orchid\Screens\User\UserProfileScreen;
@@ -175,14 +175,14 @@ Route::screen('items/assignations', AssignScreen::class)
 
 ///TASKS
 
-Route::screen('tasks', TaskScreen::class)
-    ->name('platform.tasks')
+Route::screen('Tasks', TaskScreen::class)
+    ->name('platform.Tasks')
     ->breadcrumbs(fn (Trail $trail) => $trail
         ->parent('platform.index')
-        ->push(__('Task List'), route('platform.tasks')));
+        ->push(__('Task List'), route('platform.Tasks')));
 
-Route::screen('tasks/{task}/edit', TaskEditScreen::class)
-    ->name('platform.tasks.edit')
+Route::screen('Tasks/{task}/edit', TaskEditScreen::class)
+    ->name('platform.Tasks.edit')
     ->breadcrumbs(fn (Trail $trail, $task) => $trail
-        ->parent('platform.tasks')
-        ->push($task->name, route('platform.tasks.edit', ['task' => $task])));
+        ->parent('platform.Tasks')
+        ->push($task->name, route('platform.Tasks.edit', ['task' => $task])));

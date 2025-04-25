@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Orchid\Screens\locations;
+namespace App\Orchid\Screens\Locations;
 
 use App\Http\Requests\LocationsRequest;
 use App\Models\Location;
-use App\Orchid\Layouts\locations\LocationTable;
+use App\Orchid\Layouts\Locations\LocationTable;
 use Orchid\Screen\Actions\ModalToggle;
 use Orchid\Screen\Fields\Input;
 use Orchid\Support\Facades\Layout;
