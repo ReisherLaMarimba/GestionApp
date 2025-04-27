@@ -57,7 +57,7 @@ class TaskTable extends Table
                 ->icon('bs.three-dots-vertical')
                 ->list([
                     Link::make('Edit Task')
-                        ->route('platform.tasks.edit', $task->id)
+                        ->route('platform.Tasks.edit', $task->id)
                         ->icon('bs.pencil'),
 
                      Button::make('Delete Task')
