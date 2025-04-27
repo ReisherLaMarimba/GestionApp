@@ -30,13 +30,13 @@ class ItemTable extends Table
     {
         return [
 
-            TD::make('item_code', 'Codigo')
+            TD::make('item_code', 'Code')
             ->cantHide(),
-            TD::make('name', 'Nombre')
+            TD::make('name', 'Name')
             ->cantHide(),
-            TD::make('description', 'Descripcion'),
-            TD::make('min_quantity', 'Min. Cant.'),
-            TD::make('max_quantity', 'Max. Cant.'),
+            TD::make('description', 'Description'),
+            TD::make('min_quantity', 'Min. Qty.'),
+            TD::make('max_quantity', 'Max. Qty.'),
             TD::make('stock', 'Stock')
                 ->sort()
                 ->render(fn ($item) => abs($item->stock - $item->min_quantity) <= abs($item->stock - $item->max_quantity)
@@ -53,7 +53,7 @@ class ItemTable extends Table
                     ->icon('bs.three-dots-vertical')
                     ->list([
 
-                        Link::make(__('Ver'))
+                        Link::make(__('Item Details'))
                             ->route('platform.items.show', $items->id)
                             ->icon('bs.eye'),
 
@@ -63,7 +63,7 @@ class ItemTable extends Table
 
                         Button::make(__('Delete'))
                             ->icon('bs.trash3')
-                            ->confirm(__('Una vez eliminado el item, todos sus datos serán eliminados, esta accion se puede deshacer.'))
+                            ->confirm(__('Once the item is deleted, all of its resources and data will be permanently deleted. All the agents under this item will be reassigned to BLANK'))
                             ->method('remove', [
                                 'id' => $items->id,
                             ]),

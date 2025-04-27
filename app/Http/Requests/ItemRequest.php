@@ -23,8 +23,8 @@ class ItemRequest extends FormRequest
     public function messages()
     {
         return [
-            'min_quantity.lt' => 'La cantidad mínima debe ser menor que la cantidad máxima.',
-            'max_quantity.gt' => 'La cantidad máxima debe ser mayor que la cantidad mínima.',
+            'min_quantity.lt' => 'The minimum quantity must be less than the maximum quantity.',
+            'max_quantity.gt' => 'The maximum quantity must be greater than the minimum quantity.',
         ];
     }
 
@@ -43,13 +43,14 @@ class ItemRequest extends FormRequest
             'min_quantity' => [
                 'required',
                 'numeric',
-                'lt:max_quantity', // Asegura que el valor sea menor que 'max_quantity'
+                'lte:max_quantity', // Allows min_quantity to be equal to max_quantity, but not greater
             ],
             'max_quantity' => [
                 'required',
                 'numeric',
-                'gt:min_quantity', // Asegura que el valor sea mayor que 'min_quantity'
+                'gte:min_quantity', // Allows max_quantity to be equal to min_quantity, but not lower
             ],
+
             'description'  => 'required|string',
             'image'        => 'image|mimes:jpg,png,jpeg|max:2048',
             'comments'     => 'string',

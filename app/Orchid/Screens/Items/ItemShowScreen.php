@@ -32,10 +32,10 @@ class ItemShowScreen extends Screen
         $this->item = $item;
 
         // Decode the JSON and handle null or invalid data
-        $image = json_decode($item->image, true) ?? []; // Fallback to empty array if null
+        $image = json_decode($item->image, true) ?? [];
 
 
-        $audits = $item->audits; // Get audit logs for the item
+        $audits = $item->audits;
 
 
         return [
@@ -67,19 +67,19 @@ class ItemShowScreen extends Screen
     public function commandBar(): iterable
     {
         return [
-            Button::make('Volver al listado')
+            Button::make('Back to list')
                 ->icon('bs.arrow-left')
                 ->method('back'),
 
-            Button::make('Editar')
+            Button::make('Edit')
                 ->icon('bs.pencil')
                 ->method('redirectToEdit'),
 
-            ModalToggle::make('Movimientos')
+            ModalToggle::make('Movements')
                 ->modal('auditModal') // Name of the modal
                 ->icon('list'),
 
-            Button::make('Print TAG')
+            Button::make('Print tag')
             ->icon('printer')
             ->method('printTAG')
 
@@ -109,8 +109,8 @@ class ItemShowScreen extends Screen
                     Sight::make('max_quantity', 'Maximum Quantity'),
                     Sight::make('comments', 'Comments')->render(fn (Item $item) => $item->comments ?? 'No comments available'),
                     Sight::make('status', 'Status')->render(fn (Item $item) => $item->status === 'En Inventario'
-                        ? '<i class="text-success">●</i> En Inventario'
-                        : '<i class="text-danger">●</i> Asignado'),
+                        ? '<i class="text-success">●</i> On Inventory'
+                        : '<i class="text-danger">●</i> Assigned'),
                     Sight::make('category_id', 'Category')->render(fn (Item $item) => $item->category->name ?? 'Unknown Category'),
                     Sight::make('location_id', 'Location')->render(fn (Item $item) => $item->location->name ?? 'Unknown Location'),
                     Sight::make('Additionals')->render(fn (Item $item) =>
