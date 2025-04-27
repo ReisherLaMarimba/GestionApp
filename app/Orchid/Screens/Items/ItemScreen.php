@@ -171,16 +171,14 @@ class ItemScreen extends Screen
                     Select::make('items_id')
                         ->title('Basic Items')
                         ->fromModel(
-                            Item::whereHas('category', function ($query) { // Filtrar por categoría
-                                $query->where('name', '=', 'Facilities');
-                            }),
-                            'name', 'id'
-                        )
+                            Item::whereHas('category', function ($query)
+                            {  $query->where('name', '=', 'Facilities'); }), 'name', 'id' )
                         ->multiple()
                         ->placeholder('Basic Items')
                         ->help('Elija los basic items'),
 
-                    Select::make('user_id')
+
+                        Select::make('user_id')
                         ->title('Select User')
                         ->fromModel(User::class, 'name')
                         ->multiple()
@@ -207,8 +205,6 @@ class ItemScreen extends Screen
     public function create(ItemRequest $itemRequest){
 
         $images = $itemRequest->file('images');
-
-//        dd($itemRequest->ALL());
 
         $item = Item::create([
             'item_code' => $itemRequest->item_code,
@@ -237,10 +233,10 @@ class ItemScreen extends Screen
 
                 ProcessImagesJob::dispatch($imagePath, $item->id, $column);
             }
-
+            Toast::success('The item '  . $itemRequest->item_code . ' was created successfully and images were optimized');
 
         }
-        Toast::success('El artículo se ha creado correctamente, las imagenes se estan optimizando');
+        Toast::success('The item '  . $itemRequest->item_code . ' was created successfully without images');
     }
 
     public function assignBasicItems(AssignBasicItemRequest $assignBasicItemRequest)
@@ -255,7 +251,7 @@ class ItemScreen extends Screen
 
 
             }
-        Toast::success('Asignado correctamente');
+        Toast::success('Facility assigned successfully');
         }
 
 
@@ -267,7 +263,7 @@ class ItemScreen extends Screen
     {
         Item::findOrFail($request->get('id'))->delete();
 
-        Toast::info(__('Item eliminado'));
+        Toast::info(__('The item was deleted successfully'));
     }
 
     public function printCode(Request $request)
