@@ -41,6 +41,14 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+        Schema::create('Tasks', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('description');
+            $table->softDeletes();
+            $table->timestamps();
+        });
     }
 
     /**

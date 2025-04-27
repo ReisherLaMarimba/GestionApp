@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('Tasks', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('description');
-            $table->softDeletes();
-            $table->timestamps();
-        });
+//        Schema::create('Tasks', function (Blueprint $table) {
+//            $table->id();
+//            $table->string('name');
+//            $table->string('description');
+//            $table->softDeletes();
+//            $table->timestamps();
+//        });
     }
 
     /**
