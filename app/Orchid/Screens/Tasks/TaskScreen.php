@@ -24,7 +24,7 @@ class TaskScreen extends Screen
     public function query(): iterable
     {
         return [
-            'tasks' => Task::with('users')->get(),
+            'Tasks' => Task::with('users')->get(),
 
             'user_per_task_chart' => Task::with('users')->get()->map(function ($task) {
                 return [
