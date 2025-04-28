@@ -97,7 +97,7 @@ class ItemShowScreen extends Screen
 
 
             Layout::split([
-                Layout::view('items.show-image'),
+                Layout::view('Items.show-image'),
                 Layout::legend('item', [
                     Sight::make('id')->popover('Unique identifier for the item'),
                     Sight::make('name', 'Name'),
