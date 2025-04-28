@@ -31,37 +31,37 @@ class ItemRequest extends FormRequest
 
     public function rules(): array
     {
-        $itemId = $this->route('item') ? $this->route('item')->id : null;
+        $itemId = $this->route('item')?->id;
 
         $rules = [
-            'item_code'    => 'required|string|unique:items,item_code,' . $itemId,
-            'name'         => 'required|string',
-            'weight'       => 'numeric',
-            'additionals'  => 'array',
-            'additionals.*' => 'string',
-            'min_quantity' => [
+            'item_code'     => 'required|string|unique:items,item_code,' . ($itemId ?? 'NULL') . ',id',
+            'name'          => 'required|string',
+            'weight'        => 'nullable|numeric',
+            'additionals'   => 'nullable|array',
+            'additionals.*' => 'nullable|string',
+            'min_quantity'  => [
                 'required',
                 'numeric',
-                'lte:max_quantity',
+                'lt:max_quantity', // Not LTE (less than ONLY)
             ],
-            'max_quantity' => [
+            'max_quantity'  => [
                 'required',
                 'numeric',
-                'gte:min_quantity',
+                'gt:min_quantity', // Not GTE (greater than ONLY)
             ],
-            'description'  => 'required|string',
-            'image'        => 'image|mimes:jpg,png,jpeg|max:2048',
-            'comments'     => 'string',
-            'category'     => 'required|integer|exists:categories,id',
-            'location'     => 'required|integer|exists:locations,id',
+            'description'   => 'required|string',
+            'image'         => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+            'comments'      => 'nullable|string',
+            'category'      => 'required|integer|exists:categories,id',
+            'location'      => 'required|integer|exists:locations,id',
         ];
 
-        // Only require 'stock' when creating (POST request)
         if ($this->isMethod('post')) {
             $rules['stock'] = 'required|numeric';
         }
 
         return $rules;
     }
+
 
 }
