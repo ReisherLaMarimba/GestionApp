@@ -88,6 +88,7 @@ class ItemScreen extends Screen
                 Group::make([
                     Input::make('item_code')
                         ->title('Código')
+                        ->type('string')
                         ->placeholder('Inserte el código del artículo'),
 
                     Input::make('name')
