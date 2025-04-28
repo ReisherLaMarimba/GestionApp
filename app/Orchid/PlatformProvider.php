@@ -77,7 +77,7 @@ class PlatformProvider extends OrchidServiceProvider
 //            Menu::make('Layouts Overview')
 //                ->icon('bs.window-sidebar')
 //                ->route('platform.example.layouts'),
-//
+
 //            Menu::make('Grid System')
 //                ->icon('bs.columns-gap')
 //                ->route('platform.example.grid'),

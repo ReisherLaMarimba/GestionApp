@@ -18,6 +18,16 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'last_name',
+        'photo',
+        'phone',
+        'DOB',
+        'superior',
+        'Cedula',
+        'emp_number',
+        'Hire_date',
+        'Schedule_type',
+        'task_id',
     ];
 
     /**
@@ -52,6 +62,11 @@ class User extends Authenticatable
            'email'      => Like::class,
            'updated_at' => WhereDateStartEnd::class,
            'created_at' => WhereDateStartEnd::class,
+        'Cedula'      => Like::class,
+        'emp_number'  => Like::class,
+        'Hire_date'   => Like::class,
+        'Schedule_type'   => Like::class,
+        'task_id'   => Where::class,
     ];
 
     /**
