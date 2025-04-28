@@ -59,6 +59,10 @@ class PlatformProvider extends OrchidServiceProvider
             ->icon('bs.collection')
                 ->route('platform.items.assignations'),
 
+            Menu::make('Campaigns')
+            ->icon('bs.calendar')
+                ->route('platform.Campaigns'),
+
 //            Menu::make('Get Started')
 //                ->icon('bs.book')
 //                ->title('Navigation')
