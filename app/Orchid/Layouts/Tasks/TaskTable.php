@@ -20,7 +20,7 @@ class TaskTable extends Table
      *
      * @var string
      */
-    protected $target = 'tasks';
+    protected $target = 'Tasks';
 
     //TODO: Add a filter to search by name
 
