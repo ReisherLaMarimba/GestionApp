@@ -35,7 +35,7 @@ class CategoryScreen extends Screen
      */
     public function name(): ?string
     {
-        return 'Categorias';
+        return 'Categories';
     }
 
     public function description(): ?string{

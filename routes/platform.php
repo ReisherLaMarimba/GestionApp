@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use App\Models\Item;
 use App\Orchid\Screens\Assigns\AssignScreen;
+use App\Orchid\Screens\Campaigns\CampaignEditScreen;
+use App\Orchid\Screens\Campaigns\CampaignScreen;
 use App\Orchid\Screens\Categories\CategoryEditScreen;
 use App\Orchid\Screens\Categories\CategoryScreen;
 use App\Orchid\Screens\Examples\ExampleActionsScreen;
@@ -186,3 +188,17 @@ Route::screen('Tasks/{task}/edit', TaskEditScreen::class)
     ->breadcrumbs(fn (Trail $trail, $task) => $trail
         ->parent('platform.Tasks')
         ->push($task->name, route('platform.Tasks.edit', ['task' => $task])));
+
+///Campaigns
+
+Route::screen('Campaigns', CampaignScreen::class)
+    ->name('platform.Campaigns')
+    ->breadcrumbs(fn (Trail $trail) => $trail
+        ->parent('platform.index')
+        ->push(__('Campaigns'), route('platform.Campaigns')));
+
+Route::screen('Campaigns/{campaign}/edit', CampaignEditScreen::class)
+    ->name('platform.Campaigns.edit')
+    ->breadcrumbs(fn (Trail $trail, $campaign) => $trail
+        ->parent('platform.Campaigns')
+        ->push($campaign->name, route('platform.Campaigns.edit', ['campaign' => $campaign])));
