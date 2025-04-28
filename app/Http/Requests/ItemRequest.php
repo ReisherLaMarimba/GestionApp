@@ -39,18 +39,16 @@ class ItemRequest extends FormRequest
             'weight'       => 'numeric',
             'additionals'  => 'array',
             'additionals.*' => 'string',
-
             'min_quantity' => [
                 'required',
                 'numeric',
-                'lte:max_quantity', // Allows min_quantity to be equal to max_quantity, but not greater
+                'lte:max_quantity',
             ],
             'max_quantity' => [
                 'required',
                 'numeric',
-                'gte:min_quantity', // Allows max_quantity to be equal to min_quantity, but not lower
+                'gte:min_quantity',
             ],
-
             'description'  => 'required|string',
             'image'        => 'image|mimes:jpg,png,jpeg|max:2048',
             'comments'     => 'string',
@@ -58,8 +56,8 @@ class ItemRequest extends FormRequest
             'location'     => 'required|integer|exists:locations,id',
         ];
 
-        // Solo requerir 'stock' si la solicitud es de creación
-        if (Route::currentRouteName() === 'platform.items') {
+        // Only require 'stock' when creating (POST request)
+        if ($this->isMethod('post')) {
             $rules['stock'] = 'required|numeric';
         }
 
