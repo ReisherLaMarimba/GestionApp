@@ -271,33 +271,27 @@ class ItemScreen extends Screen
     {
         $item = Item::findOrFail($request->get('id'));
 
-        // ZPL ajustado para las dimensiones 1.197" x 1.004"
         $zpl = "^XA" .
-            "^PW243^LL204^LH0,0" . // Tamaño de la etiqueta: ancho 243 dots, alto 204 dots
-
-            // Campo para el texto del código centrado
+            "^PW243^LL204^LH0,0" .
             "^FX Campo para el elemento 'CODE'" .
             "^FO20,10^FWN^CF0,30^FB243,1,C,0^FD" . $item->item_code . "^FS" .
-
-            // Campo para el código de barras basado en el código del ítem
             "^FX Campo para el código de barras del código" .
             "^FO20,50^FWN^BY1,2,50^BCN,50,N,N" .
             "^FD" . $item->item_code . "^FS" .
-
             "^XZ";
 
-        // Ruta de la impresora compartida (ajustar si es necesario)
-        $printerPath = "\\\\localhost\\ZEBRAZD410";
+        // IP and Port of the network printer
+        $printerIp = '192.168.1.100'; // <-- Change this to your printer's IP
+        $printerPort = 9100; // Standard port for Zebra printers
 
-        // Guardamos temporalmente el ZPL en un archivo
-        $tmpFile = tempnam(sys_get_temp_dir(), 'zpl');
-        file_put_contents($tmpFile, $zpl);
+        // Open a socket connection to the printer
+        $fp = fsockopen($printerIp, $printerPort, $errno, $errstr, 10);
+        if (!$fp) {
+            throw new \Exception("Could not connect to printer: $errstr ($errno)");
+        }
 
-        // Envía el archivo a la impresora
-        exec("COPY /B \"$tmpFile\" \"$printerPath\"");
-
-        // Elimina el archivo temporal
-        unlink($tmpFile);
+        fwrite($fp, $zpl);
+        fclose($fp);
 
         toast::success('Código impreso correctamente');
     }

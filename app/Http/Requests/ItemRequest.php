@@ -34,34 +34,36 @@ class ItemRequest extends FormRequest
         $itemId = $this->route('item')?->id;
 
         $rules = [
-            'item_code'     => 'required|string|unique:items,item_code,' . ($itemId ?? 'NULL') . ',id',
-            'name'          => 'required|string',
-            'weight'        => 'nullable|numeric',
-            'additionals'   => 'nullable|array',
-            'additionals.*' => 'nullable|string',
-            'min_quantity'  => [
+            'item_code'    => 'required|string|unique:items,item_code,' . $itemId,
+            'name'         => 'required|string',
+            'weight'       => 'numeric',
+            'additionals'  => 'array',
+            'additionals.*' => 'string',
+
+            'min_quantity' => [
                 'required',
                 'numeric',
-                'lt:max_quantity', // Not LTE (less than ONLY)
+                'lte:max_quantity', // Allows min_quantity to be equal to max_quantity, but not greater
             ],
-            'max_quantity'  => [
+            'max_quantity' => [
                 'required',
                 'numeric',
-                'gt:min_quantity', // Not GTE (greater than ONLY)
+                'gte:min_quantity', // Allows max_quantity to be equal to min_quantity, but not lower
             ],
-            'description'   => 'required|string',
-            'image'         => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
-            'comments'      => 'nullable|string',
-            'category'      => 'required|integer|exists:categories,id',
-            'location'      => 'required|integer|exists:locations,id',
+
+            'description'  => 'required|string',
+            'image'        => 'image|mimes:jpg,png,jpeg|max:2048',
+            'comments'     => 'string',
+            'category'     => 'required|integer|exists:categories,id',
+            'location'     => 'required|integer|exists:locations,id',
         ];
 
-        if ($this->isMethod('post')) {
+        // Solo requerir 'stock' si la solicitud es de creación
+        if (Route::currentRouteName() === 'platform.items') {
             $rules['stock'] = 'required|numeric';
         }
 
         return $rules;
     }
-
 
 }
