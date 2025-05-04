@@ -3,6 +3,7 @@
 namespace App\Orchid\Layouts\Categories;
 
 use App\Models\Category;
+use Orchid\Screen\Actions\DropDown;
 use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Layouts\Table;
 use Orchid\Screen\TD;
@@ -49,20 +50,26 @@ class CategoryTable extends Table
             TD::make('name'),
             TD::make('description'),
             TD::make('risk'),
-            TD::make('Actions')
-            ->render(function (Category $category) {
-                return Button::make('Eliminar')
-                    ->confirm('¿Estas seguro que deseas eliminar esta categoria?')
-                    ->method('delete',['category' => $category->id]);
-            }),
-            TD::make('Actions', 'Editar')
-                ->render(function ($category) {
-                   return Button::make('Editar')
-                       ->method('redirectToEdit')
-                       ->parameters(['category' => $category->id])
-                       ->novalidate();
-                }),
+            TD::make(__('Actions'))
+                ->align(TD::ALIGN_CENTER)
+                ->width('100px')
+                ->cantHide()
+                ->render(fn (Category $category) => in_array($category->name, ['CPU', 'Monitor', 'Headsets', 'Mouses','Keyboards'])
+                    ? __('X')
+                    : DropDown::make()
+                        ->icon('bs.three-dots-vertical')
+                        ->list([
+                            Button::make('Eliminar')
+                                ->icon('bs.trash3')
+                                ->confirm('¿Estas seguro que deseas eliminar esta categoria?')
+                                ->method('delete',['category' => $category->id]),
 
+                            Button::make('Editar')
+                                ->method('redirectToEdit')
+                                ->icon('bs.pencil')
+                                ->parameters(['category' => $category->id])
+                                ->novalidate()
+                        ]))
 
 
         ];

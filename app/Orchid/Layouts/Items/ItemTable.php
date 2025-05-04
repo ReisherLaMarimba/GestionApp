@@ -6,6 +6,7 @@ use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Actions\DropDown;
 use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Fields\Group;
+use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Layouts\Table;
 use Orchid\Screen\TD;
 
@@ -31,19 +32,26 @@ class ItemTable extends Table
         return [
 
             TD::make('item_code', 'Code')
-            ->cantHide(),
+            ->cantHide()
+            ->filter(Input::make()),
+
             TD::make('name', 'Name')
-            ->cantHide(),
-            TD::make('description', 'Description'),
+            ->cantHide()
+                ->filter(Input::make()),
+
+            TD::make('description', 'Description')
+                ->filter(Input::make()),
+
             TD::make('min_quantity', 'Min. Qty.'),
-            TD::make('max_quantity', 'Max. Qty.'),
+
             TD::make('stock', 'Stock')
                 ->sort()
                 ->render(fn ($item) => abs($item->stock - $item->min_quantity) <= abs($item->stock - $item->max_quantity)
                     ? "<span class='text-danger'>{$item->stock}</span>"
                     : "<span class='text-success'>{$item->stock}</span>"
                 ),
-
+            TD::make('location', 'Location')
+                ->render(fn ($item) => $item->location->name),
 
             TD::make(__('Actions'))
                 ->align(TD::ALIGN_CENTER)
@@ -52,7 +60,6 @@ class ItemTable extends Table
                 ->render(fn ($items) => DropDown::make()
                     ->icon('bs.three-dots-vertical')
                     ->list([
-
                         Link::make(__('Item Details'))
                             ->route('platform.items.show', $items->id)
                             ->icon('bs.eye'),
@@ -74,11 +81,6 @@ class ItemTable extends Table
                             'id' => $items->id,
                         ]),
                     ])),
-
-
-
-
-
         ];
     }
 }

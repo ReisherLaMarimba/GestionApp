@@ -4,6 +4,7 @@ namespace App\Orchid\Layouts\Locations;
 
 use App\Models\Location;
 use Orchid\Screen\Actions\Button;
+use Orchid\Screen\Actions\DropDown;
 use Orchid\Screen\Layouts\Table;
 use Orchid\Screen\TD;
 use Orchid\Support\Color;
@@ -47,20 +48,24 @@ class LocationTable extends Table
             TD::make('address', 'Direccion'),
             TD::make('phone', 'Telefono'),
             TD::make('email', 'Email'),
-            TD::make('actions')
-            ->render(function (Location $location) {
-                return Button::make('Eliminar')
-                    ->type(Color::WARNING)
-                    ->confirm('¿Estas seguro que deseas eliminar esta ubicacion?')
-                    ->method('delete',['location' => $location->id]);
-            }),
-            TD::make('Actions', 'Editar')
-                ->render(function ($location) {
-                   return Button::make('Editar')
-                       ->method('redirectToEdit')
-                       ->parameters(['location' => $location->id])
-                       ->novalidate();
-                }),
+            TD::make(__('actions'))
+                ->align(TD::ALIGN_CENTER)
+                ->width('100px')
+                ->cantHide()
+                ->render(fn (Location $location) => DropDown::make()
+                    ->icon('bs.three-dots-vertical')
+                    ->list([
+                        Button::make('Eliminar')
+                            ->icon('bs.trash3')
+                            ->confirm('¿Estas seguro que deseas eliminar esta ubicacion?')
+                            ->method('delete',['location' => $location->id]),
+
+                        Button::make('Editar')
+                            ->method('redirectToEdit')
+                            ->icon('bs.pencil')
+                            ->parameters(['location' => $location->id])
+                            ->novalidate()
+                    ]))
 
 
         ];
