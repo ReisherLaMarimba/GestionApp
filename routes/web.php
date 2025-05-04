@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\AvailablesItemsApi;
+
 use App\Http\Controllers\PrintController;
 use App\Jobs\ProcessImagesJob;
 use App\Models\Item;
@@ -16,8 +16,6 @@ use Illuminate\Support\Facades\Response;
 Route::get('/', function () {
     return view('welcome');
 });
-
-Route::get('/api/available-items', [AvailablesItemsApi::class, 'getAvailablesItems'])->name('api.available-items');
 
 //RETURN VIEW
 

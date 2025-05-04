@@ -5,12 +5,32 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Orchid\Filters\Filterable;
+use Orchid\Filters\Types\Like;
+use Orchid\Filters\Types\Where;
 use Orchid\Screen\AsSource;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Item extends Model implements Auditable
 {
     use AsSource, Softdeletes, Filterable, \OwenIt\Auditing\Auditable;
+
+    protected $allowedFilters = [
+        'item_code' => Like::class,
+        'name' => like::class,
+        'description' => like::class,
+        'stock' => Where::class,
+        'category_id' => Where::class,
+        'location_id' => Where::class,
+
+    ];
+
+    protected $allowedSorts = [
+        'stock',
+
+
+    ];
+
+
     protected $fillable = ['name','item_code', 'description', 'weight', 'min_quantity', 'max_quantity','category_id', 'location_id', 'stock', 'images', 'damage_images', 'comments', 'status', 'additionals','assigned_to'];
 
 

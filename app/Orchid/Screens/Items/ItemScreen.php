@@ -68,10 +68,12 @@ class ItemScreen extends Screen
                 ->method('create')
                 ->icon('plus'),
 
-            Modaltoggle::make('Assign facilities')
-                ->modal('assignBasicItemsModal')
-                ->method('assignBasicItems')
-                ->icon('list')
+            ModalToggle::make('Fast Find (FF)')
+                ->modal('searchModal')
+                ->icon('search'),
+
+
+
         ];
     }
 
@@ -83,6 +85,13 @@ class ItemScreen extends Screen
     public function layout(): iterable
     {
         return [
+
+            Layout::modal('searchModal',
+                layout::view('FFI.FindFastItem')
+            )->title('Buscar')
+            ->closeButton(false)
+            ->applyButton(false),
+
 
             Layout::modal('itemsModal', Layout::rows([
                 Group::make([
@@ -167,34 +176,6 @@ class ItemScreen extends Screen
                 ->title('Crear Artículo')
                 ->size(Modal::SIZE_LG),
 
-            Layout::modal('assignBasicItemsModal', Layout::rows([
-                Group::make([
-                    Select::make('items_id')
-                        ->title('Basic Items')
-                        ->fromModel(
-                            Item::whereHas('category', function ($query)
-                            {  $query->where('name', '=', 'Facilities'); }), 'name', 'id' )
-                        ->multiple()
-                        ->placeholder('Basic Items')
-                        ->help('Elija los basic items'),
-
-
-                        Select::make('user_id')
-                        ->title('Select User')
-                        ->fromModel(User::class, 'name')
-                        ->multiple()
-                        ->placeholder('Select User')
-                        ->help('Elija los usuarios')
-
-
-
-        ]),
-
-
-            ]))->title('Assign Facilities'),
-
-
-
 
             ItemTable::class
         ];
@@ -202,6 +183,10 @@ class ItemScreen extends Screen
 
 
     }
+
+
+
+
 
     public function create(ItemRequest $itemRequest){
 
@@ -239,21 +224,6 @@ class ItemScreen extends Screen
         }
         Toast::success('The item '  . $itemRequest->item_code . ' was created successfully without images');
     }
-
-    public function assignBasicItems(AssignBasicItemRequest $assignBasicItemRequest)
-    {
-        $data = $assignBasicItemRequest->all();
-
-        foreach($data['items_id'] as $itemId){
-            ItemUser::create([
-                'user_id' => $data['user_id'][0],
-                'item_id' => $itemId,
-                ]);
-
-
-            }
-        Toast::success('Facility assigned successfully');
-        }
 
 
 
