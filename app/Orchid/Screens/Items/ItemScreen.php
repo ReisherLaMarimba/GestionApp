@@ -241,30 +241,50 @@ class ItemScreen extends Screen
     {
         $item = Item::findOrFail($request->get('id'));
 
+        // ZPL ajustado para las dimensiones 1.197" x 1.004"
         $zpl = "^XA" .
-            "^PW243^LL204^LH0,0" .
+            "^PW520^LL400^LH0,0" . // Tamaño de la etiqueta: ancho 243 dots, alto 204 dots
+
+            // Texto del código centrado arriba
             "^FX Campo para el elemento 'CODE'" .
-            "^FO20,10^FWN^CF0,30^FB243,1,C,0^FD" . $item->item_code . "^FS" .
-            "^FX Campo para el código de barras del código" .
-            "^FO20,50^FWN^BY1,2,50^BCN,50,N,N" .
-            "^FD" . $item->item_code . "^FS" .
+            "^^FO130,30^A0N,30,30^FD" . $item->item_code . "^FS" .
+
+            // Código QR apuntando a la URL
+            "^FX Código QR que apunta al sistema" .
+            "^FO180,40^BQN,2,3^FDLA,https://gestionapp-main-xkaoxd.laravel.cloud/admin^FS" .
+
+            // Descripción del ítem debajo del QR
+            "^FX Descripción del artículo" .
+            "^FO130,150^A0N,30,30^FD" . $item->description . "^FS" .
+
             "^XZ";
 
-        // IP and Port of the network printer
-        $printerIp = '192.168.1.100'; // <-- Change this to your printer's IP
-        $printerPort = 9100; // Standard port for Zebra printers
+//        ^FO130,30^A0N,30,30^FD CMAX-PC001^FS  ; Texto superior centrado
+//
+//        ^FO180,10^BQN,2,4^FDLA,CMAX-PC001^FS  ; Código QR alineado debajo del texto
+//
+//        ^FO130,150^A0N,30,30^FD DESCRIPTION^FS  ; Descripción alineada debajo del QR
+//
+//
 
-        // Open a socket connection to the printer
-        $fp = fsockopen($printerIp, $printerPort, $errno, $errstr, 10);
-        if (!$fp) {
-            throw new \Exception("Could not connect to printer: $errstr ($errno)");
-        }
+        // Ruta de la impresora compartida (ajustar si es necesario)
+        $printerPath = "\\\\localhost\\ZebraPrinter";
 
-        fwrite($fp, $zpl);
-        fclose($fp);
+        // Guardamos temporalmente el ZPL en un archivo
+        $tmpFile = tempnam(sys_get_temp_dir(), 'zpl');
+        file_put_contents($tmpFile, $zpl);
+
+        // Envía el archivo a la impresora
+        exec("cmd /c COPY /B \"$tmpFile\" \"$printerPath\"");
+
+        // Elimina el archivo temporal
+        unlink($tmpFile);
 
         toast::success('Código impreso correctamente');
     }
+
+
+
 
 
 }

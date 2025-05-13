@@ -8,6 +8,7 @@ use App\Models\Additional;
 use App\Models\Category;
 use App\Models\Item;
 use App\Models\Location;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Fields\Group;
@@ -57,6 +58,10 @@ class ItemEditScreen extends Screen
             Button::make('Save Changes')
                 ->icon('save')
                 ->method('update'),
+
+            Button::make('Print Code')
+                ->icon('print')
+                ->method('printCode'),
 
             Button::make('Cancel')
                 ->icon('close')
@@ -208,5 +213,51 @@ class ItemEditScreen extends Screen
     public function cancelEdit()
     {
         return redirect()->route('platform.items');
+    }
+
+    public function printCode(Request $request)
+    {
+        $item = Item::findOrFail($request->get('id'));
+
+        // ZPL ajustado para las dimensiones 1.197" x 1.004"
+        $zpl = "^XA" .
+            "^PW520^LL400^LH0,0" . // Tamaño de la etiqueta: ancho 243 dots, alto 204 dots
+
+            // Texto del código centrado arriba
+            "^FX Campo para el elemento 'CODE'" .
+            "^^FO130,30^A0N,30,30^FD" . $item->item_code . "^FS" .
+
+            // Código QR apuntando a la URL
+            "^FX Código QR que apunta al sistema" .
+            "^FO180,40^BQN,2,3^FDLA,https://gestionapp-main-xkaoxd.laravel.cloud/admin^FS" .
+
+            // Descripción del ítem debajo del QR
+            "^FX Descripción del artículo" .
+            "^FO130,150^A0N,30,30^FD" . $item->description . "^FS" .
+
+            "^XZ";
+
+//        ^FO130,30^A0N,30,30^FD CMAX-PC001^FS  ; Texto superior centrado
+//
+//        ^FO180,10^BQN,2,4^FDLA,CMAX-PC001^FS  ; Código QR alineado debajo del texto
+//
+//        ^FO130,150^A0N,30,30^FD DESCRIPTION^FS  ; Descripción alineada debajo del QR
+//
+//
+
+        // Ruta de la impresora compartida (ajustar si es necesario)
+        $printerPath = "\\\\localhost\\ZebraPrinter";
+
+        // Guardamos temporalmente el ZPL en un archivo
+        $tmpFile = tempnam(sys_get_temp_dir(), 'zpl');
+        file_put_contents($tmpFile, $zpl);
+
+        // Envía el archivo a la impresora
+        exec("cmd /c COPY /B \"$tmpFile\" \"$printerPath\"");
+
+        // Elimina el archivo temporal
+        unlink($tmpFile);
+
+        toast::success('Código impreso correctamente');
     }
 }
